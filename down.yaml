@@ -1,7 +1,47 @@
 ---
 - hosts: localhost
   tasks:
-  - name: "remove kubernetes python package"
-    pip:
-      name: kubernetes
-      state: absent
+    - name: "Delete Jenkins ingress"
+      k8s:
+        api_version: networking.k8s.io/v1
+        kind: Ingress
+        namespace: jenkins
+        name: jenkins-ingress
+        state: absent
+
+    - name: "Delete Jenkins services"
+      k8s:
+        namespace: jenkins
+        definition: "{{ lookup('file', 'jenkins-service.yaml') }}"
+        state: absent
+      vars:
+        jenkins-service.yaml: |
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: jenkins
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: jenkins-jnlp
+
+    - name: "Delete Jenkins deployment"
+      k8s:
+        api_version: apps/v1
+        kind: Deployment
+        namespace: jenkins
+        name: jenkins
+        state: absent
+
+    - name: "Delete jenkins namespace"
+      k8s:
+        api_version: v1
+        kind: Namespace
+        name: jenkins
+        state: absent
+
+    - name: "remove kubernetes python package"
+      pip:
+        name: kubernetes
+        state: absent
