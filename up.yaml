@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: deploy-all
+spec:
+  template:
+    spec:
+      containers:
+      - name: kubectl
+        image: bitnami/kubectl:latest
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            ls -l /configs &&  # List files for debugging
+            kubectl apply -f /configs/nginx-proxy-deployment.yaml &&
+            kubectl apply -f /configs/gitea-deployment.yaml &&
+            kubectl apply -f /configs/supabase-deployment.yaml &&
+            kubectl apply -f /configs/jenkins-deployment.yaml &&
+            kubectl apply -f /configs/ngrok-deployment.yaml
+        volumeMounts:
+        - name: config-volume
+          mountPath: /configs
+      volumes:
+      - name: config-volume
+        hostPath:
+          path: /workspaces/Final-Assignment---Supabase-and-Atomic-CRM
+          type: Directory
+      restartPolicy: Never
+  backoffLimit: 1
