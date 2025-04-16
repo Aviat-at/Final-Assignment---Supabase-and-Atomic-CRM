@@ -1,5 +1,5 @@
 # cdevops-jenkins
-k8s lab to install jenkins and use it from github and gitea
+Final Assignment - Supabase and Atomic CRM
 
 TLDR;
 
@@ -35,7 +35,7 @@ If you have another result try installing a k8s cluster:
 bash <(curl -Ls https://raw.githubusercontent.com//conestogac-acsit/cdevops-bootstrap/refs/heads/main/k8s.sh)
 ```
 
-Your job is to edit the up.yaml to add jenkins to your cluster and down.yaml to remove it. You will also need to expose jenkins with the ngrok ingress, as you did with the previous assignment.
+This assignment consists of 4 parts of getting marmelab atomic crm running on your cluster.
 
 ### Points to Cover
 
@@ -43,16 +43,11 @@ Your job is to edit the up.yaml to add jenkins to your cluster and down.yaml to 
 
 |Item|Out Of|
 |--|--:|
-|use [this article](https://www.digitalocean.com/community/tutorials/how-to-install-jenkins-on-kubernetes) and [this documentation](https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html) to create an up.yaml that installs jenkins on your cluster|2|
-|create a down.yaml that makes the resources created by up.yaml absent. (you will need to reverse the order)|2|
-|Use [this article](https://www.jenkins.io/doc/tutorials/build-a-python-app-with-pyinstaller/) to create a 2nd repository containing a Jenkinsfile|2|
-|push this repository to github and configure github to run the Jenkinsfile through the ngrok ingress|2|
-|push this repository to gitea and configure gitea to run the jenkins file with the cluster ip|2|
+|Part 1. Create a repository with an up.yaml and down.yaml to get supabase running on your cluster|5|
+|Part 2. Create a repository on one of your gitea(s) by cloning https://github.com/marmelab/atomic-crm, and adding the other as a collaborator|5|
+|Part 3. Create a jenkinsfile that updates atomic crm on your cluster every time code is pushed |5|
+|Part 4. Commit a visible change to your atomic crm repository and push it. Use ngrok ingress to expose atomic crm from your cluster to the internet |5|
+
 |||
-|total|10|
+|total|20|
 
-Submit links to all 3 repositories:
-
-1. this repository with your up.yaml and down.yaml for running jenkins on your cluster.
-2. your github repository with the fork from the article and a Jenkinsfile.
-3. your gitea repository with the fork from the article and a Jenkinsfile, exposed with the ngrok ingress

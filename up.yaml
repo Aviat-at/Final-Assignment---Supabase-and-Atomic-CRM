@@ -1,104 +1,65 @@
+# jenkins-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      containers:
+        - name: jenkins
+          image: jenkins/jenkins:lts
+          ports:
+            - name: http-port
+              containerPort: 8080
+            - name: jnlp-port
+              containerPort: 50000
+          volumeMounts:
+            - name: jenkins-vol
+              mountPath: /var/jenkins_home
+      volumes:
+        - name: jenkins-vol
+          persistentVolumeClaim:
+            claimName: jenkins-pvc
+
 ---
-- hosts: localhost
-  tasks:
-    - name: "Install kubernetes python package"
-      pip:
-        name: kubernetes
-        state: present
+# jenkins-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jenkins-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
 
-    - name: "Create jenkins namespace"
-      k8s:
-        api_version: v1
-        kind: Namespace
-        name: jenkins
-        state: present
-
-    - name: "Deploy Jenkins"
-      k8s:
-        api_version: apps/v1
-        kind: Deployment
-        namespace: jenkins
-        definition:
-          metadata:
-            name: jenkins
-          spec:
-            replicas: 1
-            selector:
-              matchLabels:
-                app: jenkins
-            template:
-              metadata:
-                labels:
-                  app: jenkins
-              spec:
-                containers:
-                - name: jenkins
-                  image: jenkins/jenkins:lts
-                  ports:
-                    - name: http-port
-                      containerPort: 8080
-                    - name: jnlp-port
-                      containerPort: 50000
-                  volumeMounts:
-                    - name: jenkins-vol
-                      mountPath: /var/jenkins_vol
-                volumes:
-                  - name: jenkins-vol
-                    emptyDir: {}
-
-    - name: "Create Jenkins services"
-      k8s:
-        namespace: jenkins
-        definition:
-          apiVersion: v1
-          kind: Service
-          metadata:
-            name: jenkins
-          spec:
-            type: NodePort
-            ports:
-              - port: 8080
-                targetPort: 8080
-                nodePort: 30000
-            selector:
-              app: jenkins
-
-    - name: "Create Jenkins JNLP service"
-      k8s:
-        namespace: jenkins
-        definition:
-          apiVersion: v1
-          kind: Service
-          metadata:
-            name: jenkins-jnlp
-          spec:
-            type: ClusterIP
-            ports:
-              - port: 50000
-                targetPort: 50000
-            selector:
-              app: jenkins
-
-    - name: "Expose Jenkins via ngrok ingress"
-      k8s:
-        api_version: networking.k8s.io/v1
-        kind: Ingress
-        namespace: jenkins
-        definition:
-          metadata:
-            name: jenkins-ingress
-            annotations:
-              kubernetes.io/ingress.class: "nginx"
-              nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-          spec:
-            rules:
-            - host: arriving-humorous-earwig.ngrok-free.app
-              http:
-                paths:
-                - path: /
-                  pathType: Prefix
-                  backend:
-                    service:
-                      name: jenkins
-                      port:
-                        number: 8080
+---
+# jenkins-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins-service
+spec:
+  selector:
+    app: jenkins
+  type: NodePort
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8080
+      nodePort: 30080
+    - name: jnlp
+      protocol: TCP
+      port: 50000
+      targetPort: 50000
+      nodePort: 30500
