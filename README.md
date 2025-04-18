@@ -1,53 +1,70 @@
-# cdevops-jenkins
-Final Assignment - Supabase and Atomic CRM
+# Kubernetes Cluster Setup with k3s
 
-TLDR;
+## Project Overview
 
-```bash
-ansible-playbook up.yaml
+This documentation outlines our approach to setting up a Kubernetes cluster using k3s in a VM environment. After encountering port blocking issues in GitHub Codespaces and resource sharing limitations in local environments, we've migrated to a VM-based k3s solution for our development and deployment needs.
+
+## Components
+
+Our Kubernetes cluster integrates the following key components:
+
+1. **k3s** - A lightweight Kubernetes distribution optimized for edge and IoT deployments
+2. **Jenkins** - CI/CD automation server for building, testing, and deploying applications
+3. **Gitea** - Self-hosted Git service for source code management
+4. **Supabase** - Open source Firebase alternative with a Postgres database
+5. **Atomic CM** - Configuration management for the cluster
+
+## Installation Links
+
+### CI/CD Pipeline
+- [Jenkins Deployment]() <!-- Add your Jenkins deployment link -->
+
+### Source Code Management
+- [Gitea Configuration]() <!-- Add your Gitea setup link -->
+
+### Database Layer
+- [Supabase Integration]() <!-- Add your Supabase integration link -->
+
+### Configuration Management
+- [Atomic CM Setup]() <!-- Add your Atomic CM configuration link -->
+
+## Deployment Architecture
+
+Our k3s-based Kubernetes cluster runs on a virtual machine with the following architecture:
+
+```
+VM Host
+└── k3s Kubernetes Cluster
+    ├── Jenkins Deployment
+    │   
+    ├── Gitea Deployment + Services
+    │  
+    ├── Supabase Components
+    │   
+    └── Atomic CM (Cluster-wide)
 ```
 
-You may need some pre-requisites
+## Known Issues and Solutions
 
-1. Make sure that docker is running by doing `docker ps` until it shows 
+### Port Blocking in Codespaces
+We initially attempted deployment in GitHub Codespaces but encountered security restrictions that blocked required ports for communication between services.
 
-```
-CONTAINER ID   IMAGE                            COMMAND                  CREATED         STATUS         PORTS                             NAMES
+### Resource Sharing Limitations
+Local environment deployments faced challenges with resource sharing among team members, making collaboration difficult.
 
-```
+### Solution
+Migration to a k3s-based VM environment resolved these issues by:
+- Providing full control over port configurations
+- Enabling centralized access for all team members
+- Reducing resource requirements through k3s's lightweight architecture
 
-2. run `ansible-playbook --version` to see if you have ansible. If not run:
+## Access Information
 
-```bash
-bash <(curl -Ls https://raw.githubusercontent.com/conestogac-acsit/cdevops-bootstrap/refs/heads/main/bootstrap.sh)
-```
 
-3. run `kubectl get ns default` to see if you have a cluster. The expected result is:
+- Jenkins Web Interface: [Jenkins URL]() (http://157.90.239.132:32001/)
+- Gitea repo: [Gitea URL]() http://157.90.239.132:3000/aviat/atomic-crm
+- Supabase Dashboard: [Supabase URL]() http://157.90.239.132:31370/project/default/sql/1
 
-```
-NAME      STATUS   AGE
-default   Active   29m
-```
 
-If you have another result try installing a k8s cluster:
 
-```bash
-bash <(curl -Ls https://raw.githubusercontent.com//conestogac-acsit/cdevops-bootstrap/refs/heads/main/k8s.sh)
-```
-
-This assignment consists of 4 parts of getting marmelab atomic crm running on your cluster.
-
-### Points to Cover
-
-## Marking
-
-|Item|Out Of|
-|--|--:|
-|Part 1. Create a repository with an up.yaml and down.yaml to get supabase running on your cluster|5|
-|Part 2. Create a repository on one of your gitea(s) by cloning https://github.com/marmelab/atomic-crm, and adding the other as a collaborator|5|
-|Part 3. Create a jenkinsfile that updates atomic crm on your cluster every time code is pushed |5|
-|Part 4. Commit a visible change to your atomic crm repository and push it. Use ngrok ingress to expose atomic crm from your cluster to the internet |5|
-
-|||
-|total|20|
 
